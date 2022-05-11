@@ -1,2 +1,3 @@
 # pixels-to-text
-A javascript pixel art like project using canva
+
+A javascript pixel art like project using canvas
