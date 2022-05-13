@@ -6,7 +6,24 @@ const ctx = canvas.getContext("2d");
 const image1 = new Image();
 image1.crossOrigin = "anonymous";
 image1.src =
-  "https://cdn.pixabay.com/photo/2021/12/19/21/48/eurasian-pygmy-owl-6881984_960_720.jpg";
+  "https://cdn.pixabay.com/photo/2015/12/09/01/02/mandalas-1084082_960_720.jpg";
+
+const inputSlider = document.getElementById("resolution");
+const inputLabel = document.getElementById("resolutionLabel");
+inputSlider.addEventListener("change", handleSlider);
+
+class Cell {
+  constructor(x, y, symbol, color) {
+    this.x = x;
+    this.y = y;
+    this.symbol = symbol;
+    this.color = color;
+  }
+  draw(ctx) {
+    ctx.fillStyle = this.color;
+    ctx.fillText(this.symbol, this.x, this.y);
+  }
+}
 
 class AsciiEffect {
   #imageCellArray = [];
@@ -56,17 +73,37 @@ class AsciiEffect {
           const avarageColorValue = total / 3;
           const color = `rgb(${red}, ${green}, ${blue})`;
           const symbol = this.#convertToSymbol(avarageColorValue);
-          if (total > 200)
-            this.#imageCellArray.push(new cellSize(x, y, symbol, color));
+          this.#imageCellArray.push(new Cell(x, y, symbol, color));
         }
       }
     }
   }
+  #drawAscii() {
+    this.#ctx.clearRect(0, 0, this.#width, this.#height);
+    for (let i = 0; i < this.#imageCellArray.length; i++) {
+      this.#imageCellArray[i].draw(this.#ctx);
+    }
+  }
+  draw(cellSize) {
+    this.#scanImage(cellSize);
+    this.#drawAscii();
+  }
 }
 let effect;
+
+function handleSlider() {
+  if (inputSlider.value == 1) {
+    inputLabel.textContent = "Original image";
+    ctx.drawImage(image1, 0, 0, canvas.width, canvas.height);
+  } else {
+    inputLabel.textContent = "Resolution: " + inputSlider.value + " px";
+    effect.draw(parseInt(inputSlider.value));
+  }
+}
 
 image1.onload = function initialize() {
   canvas.width = image1.width;
   canvas.height = image1.height;
   effect = new AsciiEffect(ctx, image1.width, image1.height);
+  handleSlider();
 };
